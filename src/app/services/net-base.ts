@@ -6,7 +6,6 @@ import { Injectable } from '@angular/core';
 import {
     HttpClient,
     HttpResponse,
-    // HttpHeaders,
     HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';

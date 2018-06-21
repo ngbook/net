@@ -1,3 +1,8 @@
 <div class="app-root">
-    {{data}}
+    <div class="items">
+        <div class="item" *ngFor="let fruit of data">
+            <img src="http://ou2gp2r4n.bkt.clouddn.com/ngbook/fruits/v2/{{fruit.pic}}" alt="{{fruit.name}}">
+            <p class="desc">{{fruit.name}}</p>
+        </div>
+    </div>
 </div>

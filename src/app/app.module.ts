@@ -1,16 +1,35 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
+import {
+    HttpClientModule,
+    HTTP_INTERCEPTORS,
+} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
+import { GetFruitsService } from './services/get-fruits.service';
+import { GlobalErrorHandler } from './services/global-error.event';
+import { AuthInterceptor } from './services/auth.interceptor';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        HttpClientModule,
+    ],
+    providers: [
+        GetFruitsService,
+        {
+            provide: ErrorHandler,
+            useClass: GlobalErrorHandler
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
+        },
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -28,7 +28,6 @@ export class RequestBase {
         const headers = this.wrapHeader();
         const options: any = {
             headers,
-            // observe: 'response',
         };
 
         const observe = this.http.post<Object>(

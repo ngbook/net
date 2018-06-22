@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
         // request list
-        this.request('fruit/');
+        this.request('fruit');
         // request 500 error
         this.request('fruit/error');
         // request error code

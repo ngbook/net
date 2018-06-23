@@ -9,6 +9,12 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/empty';
 
+export interface Response {
+    code: number;
+    data?: any;
+    msg?: string; // additional message
+}
+
 @Injectable()
 export class GetFruitsService {
 
@@ -22,7 +28,7 @@ export class GetFruitsService {
         });
         const options = { headers };
 
-        return this.http.post(url, data, options )
+        return this.http.post<Response>(url, data, options )
             .map((rsp) => {
                 if (this.handleCommonErr(rsp)) {
                     // 无通用错误时才会进入

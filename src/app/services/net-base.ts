@@ -33,7 +33,7 @@ export class RequestBase {
         data?: any): Observable<any> {
         const url = API_BASE_URL + urlWithoutDomain;
         const headers = this.wrapHeader();
-        const options = {
+        const options: any = {
             headers,
             observe: 'response',
         };

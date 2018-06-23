@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 export class AuthInterceptor implements HttpInterceptor {
     // 拦截
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        // 添加 auth token
         const authToken = localStorage.getItem('auth') || '';
         const modified = req.clone({
             setHeaders: {

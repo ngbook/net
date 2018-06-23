@@ -67,7 +67,6 @@ export class RequestBase {
 
         let observe: Observable<HttpEvent<Response>>;
         if (reqMethod === 'post') {
-            options.headers['Content-Type'] = 'application/json';
             observe = this.http.post<Response>(
                 url, data, options);
         } else { // 默认用get请求

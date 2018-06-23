@@ -101,26 +101,26 @@ export class RequestBase {
         }
     }
 
-private processRsp(rsp: HttpResponse<Response>): HttpResult {
-    console.log('- 处理返回 -');
-    const { body, ...opts } = rsp;
-    const code = body && body.code;
-    // 对共同code做处理
-    // case里如果没必要做下一步处理的，直接return就行
-    switch (code) {
-        case 1001: // 未知错误
-            console.log('...未知错误');
-            break;
-        case 1005: // token已过期
-            // 提示错误，可能还要跳到登录页
-            break;
-        // ... other cases
-        default:
-            // default handler...
-            break;
+    private processRsp(rsp: HttpResponse<Response>): HttpResult {
+        console.log('- 处理返回 -');
+        const { body, ...opts } = rsp;
+        const code = body && body.code;
+        // 对共同code做处理
+        // case里如果没必要做下一步处理的，直接return就行
+        switch (code) {
+            case 1001: // 未知错误
+                console.log('...未知错误');
+                break;
+            case 1005: // token已过期
+                // 提示错误，可能还要跳到登录页
+                break;
+            // ... other cases
+            default:
+                // default handler...
+                break;
+        }
+        return { body, opts };
     }
-    return { body, opts };
-}
 
     private obj2urlParam(data: Object): string {
         return Object.keys(data).map((key) => {

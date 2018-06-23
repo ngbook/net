@@ -35,22 +35,22 @@ export class RequestBase {
     /**
      * Post 请求
      */
-protected post(urlWithoutDomain: string,
-    data?: any): Observable<HttpResult> {
-    const url = API_BASE_URL + urlWithoutDomain;
-    const headers = this.wrapHeader();
-    const options: any = {
-        headers,
-        observe: 'response',
-    };
+    protected post(urlWithoutDomain: string,
+        data?: any): Observable<HttpResult> {
+        const url = API_BASE_URL + urlWithoutDomain;
+        const headers = this.wrapHeader();
+        const options: any = {
+            headers,
+            observe: 'response',
+        };
 
-    const observe = this.http.post<Response>(
-        url, data, options);
-    return observe
-        .map<HttpEvent<Response>,
-             HttpResult>(this.processRsp.bind(this))
-        .catch(error => this.handleError(error));
-}
+        const observe = this.http.post<Response>(
+            url, data, options);
+        return observe
+            .map<HttpEvent<Response>,
+                 HttpResult>(this.processRsp.bind(this))
+            .catch(error => this.handleError(error));
+    }
 
     /**
      * 定制请求头等 通用请求部分

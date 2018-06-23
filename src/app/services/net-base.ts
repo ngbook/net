@@ -15,6 +15,12 @@ import 'rxjs/add/observable/of';
 
 const API_BASE_URL = 'https://api.ngbook.net/';
 
+export interface Response {
+    code: number;
+    data?: any;
+    msg?: string; // additional message
+}
+
 @Injectable()
 export class RequestBase {
 
@@ -32,7 +38,7 @@ export class RequestBase {
             observe: 'response',
         };
 
-        const observe = this.http.post<HttpResponse<Object>>(
+        const observe = this.http.post<HttpResponse<Response>>(
             url, data, options);
         return observe.map(this.processRsp.bind(this))
             .catch(error => this.handleError(error));
@@ -75,32 +81,25 @@ export class RequestBase {
         }
     }
 
-    private processRsp(rsp: any) {
+    private processRsp(rsp: HttpResponse<Response>) {
         console.log('- 处理返回 -', rsp);
-        if (rsp instanceof Event) { // ProgressEvent
-            return {
-                code: 1001
-            };
+        const body = rsp.body;
+        const code = body && body.code;
+        // 对共同code做处理
+        // case里如果没必要做下一步处理的，直接return就行
+        switch (code) {
+            case 1001: // 未知错误
+                console.log('...未知错误');
+                break;
+            case 1005: // token已过期
+                // 提示错误，可能还要跳到登录页
+                break;
+            // ... other cases
+            default:
+                // default handler...
+                break;
         }
-        if (rsp instanceof HttpResponse) { // HttpResponse
-            const body = rsp.body;
-            const code = body && body.code;
-            // 对共同code做处理
-            // case里如果没必要做下一步处理的，直接return就行
-            switch (code) {
-                case 1001: // 未知错误
-                    console.log('...未知错误');
-                    break;
-                case 1005: // token已过期
-                    // 提示错误，可能还要跳到登录页
-                    break;
-                // ... other cases
-                default:
-                    // default handler...
-                    break;
-            }
-            return body;
-        }
+        return body;
     }
 
     private obj2urlParam(data: Object): string {

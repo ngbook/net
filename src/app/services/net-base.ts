@@ -32,7 +32,7 @@ export class RequestBase {
             observe: 'response',
         };
 
-        const observe = this.http.post<Object>(
+        const observe = this.http.post<HttpResponse<Object>>(
             url, data, options);
         return observe.map(this.processRsp.bind(this))
             .catch(error => this.handleError(error));
@@ -54,15 +54,25 @@ export class RequestBase {
      * 处理异常
      */
     private handleError(error: HttpErrorResponse) {
-        console.log('handleError - 出现错误: ', error);
-        if (error instanceof HttpErrorResponse) {
-            // 有时会遇到：虽然返回状态非200，但也有返回结果，则把它抽出来经 processRsp 再处理一次
+        if (error.error instanceof ErrorEvent) {
+            // 网络错误，或浏览器引起的错误（不包含跨域）
+            console.error('发生网络异常...', error.error.message);
+            return Observable.of({
+                code: 1000,
+                data: {
+                    status: error.status,
+                    // 通过statusText返回的信息
+                    msg: error.statusText
+                }
+            });
+        } else { // 服务端返回的错误
+            // 返回的 body 里可能有相关的信息
+            console.error(`服务端返回错误码： ${error.status}`);
             const body = error.error;
-            if (body) {
+            if (body && body.code) {
                 return Observable.of(this.processRsp(body));
             }
         }
-        return Observable.of(error);
     }
 
     private processRsp(rsp: any) {

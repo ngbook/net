@@ -122,10 +122,7 @@ export class RequestBase {
                     this.processRsp(
                         new HttpResponse<Response>({
                             body,
-                            headers,
-                            status,
-                            statusText,
-                            url
+                            headers, status, statusText, url
                         })
                     )
                 );

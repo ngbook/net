@@ -15,6 +15,12 @@ import 'rxjs/add/observable/of';
 
 const API_BASE_URL = 'https://api.ngbook.net/';
 
+export interface Response {
+    code: number;
+    data?: any;
+    msg?: string; // additional message
+}
+
 @Injectable()
 export class RequestBase {
 
@@ -62,18 +68,18 @@ export class RequestBase {
             observe: 'response',
         };
 
-        let observe: Observable<HttpResponse<Object>> | Observable<Object>;
+        let observe: Observable<HttpResponse<Response>> | Observable<Object>;
         if (reqMethod === 'post') {
             options.headers = {
                 ...headers,
                 'Content-Type': 'application/json'
             };
-            observe = this.http.post<HttpResponse<Object>>(
+            observe = this.http.post<HttpResponse<Response>>(
                 url, data, options);
         } else if (reqMethod === 'delete') {
             observe = this.http.delete(url, options);
         } else { // 默认用get请求
-            observe = this.http.get<HttpResponse<Object>>(
+            observe = this.http.get<HttpResponse<Response>>(
                 url, options);
         }
         return observe.map(this.processRsp.bind(this))

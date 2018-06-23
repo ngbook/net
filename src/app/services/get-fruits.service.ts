@@ -45,7 +45,7 @@ export class GetFruitsService {
                 return Observable.empty();
             });
     }
-    private handleCommonErr(rsp) {
+    private handleCommonErr(rsp: Response) {
         if (rsp.code === 0) {
             return true;
         } else {

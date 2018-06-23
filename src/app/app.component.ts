@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GetFruitsService } from './services/get-fruits.service';
 
-const API_URL = 'http://api.ngbook.techzto.com/fruit/';
+const API_URL = 'http://api.ngbook.net/fruit/';
 
 @Component({
   selector: 'app-root',

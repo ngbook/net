@@ -7,6 +7,8 @@ import {
     HttpClient,
     HttpResponse,
     HttpErrorResponse,
+    HttpResponseBase,
+    HttpEvent,
 } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/catch';
@@ -20,6 +22,10 @@ export interface Response {
     data?: any;
     msg?: string; // additional message
 }
+export interface HttpResult {
+    body: Response;
+    opts?: Partial<HttpResponseBase>;
+}
 
 @Injectable()
 export class RequestBase {
@@ -30,7 +36,7 @@ export class RequestBase {
      * Post 请求
      */
     protected post(urlWithoutDomain: string,
-        data?: any): Observable<any> {
+        data?: any): Observable<HttpResult> {
         const url = API_BASE_URL + urlWithoutDomain;
         const headers = this.wrapHeader();
         const options: any = {
@@ -38,9 +44,11 @@ export class RequestBase {
             observe: 'response',
         };
 
-        const observe = this.http.post<HttpResponse<Response>>(
+        const observe = this.http.post<Response>(
             url, data, options);
-        return observe.map(this.processRsp.bind(this))
+        return observe
+            .map<HttpEvent<Response>,
+                 HttpResult>(this.processRsp.bind(this))
             .catch(error => this.handleError(error));
     }
 
@@ -59,14 +67,16 @@ export class RequestBase {
     /**
      * 处理异常
      */
-    private handleError(error: HttpErrorResponse) {
+    private handleError(error: HttpErrorResponse): Observable<HttpResult> {
         if (error.error instanceof ErrorEvent) {
             // 网络错误，或浏览器引起的错误（不包含跨域）
             console.error('发生网络异常...', error.error.message);
-            return Observable.of({
-                code: 1000,
-                data: {
-                    status: error.status,
+            return Observable.of<HttpResult>({
+                body: {
+                    code: 1001,
+                    data: {
+                        status: error.status,
+                    },
                     // 通过statusText返回的信息
                     msg: error.statusText
                 }
@@ -75,32 +85,42 @@ export class RequestBase {
             // 返回的 body 里可能有相关的信息
             console.error(`服务端返回错误码： ${error.status}`);
             const body = error.error;
-            if (body && body.code) {
-                return Observable.of(this.processRsp(body));
+            if (body && body.code) { // 进入这里，body.code 还为0的话那就是服务端的问题了，这种情况不处理
+                const {
+                    headers, status, statusText, url
+                } = error;
+                return Observable.of<HttpResult>(
+                    this.processRsp(
+                        new HttpResponse<Response>({
+                            body,
+                            headers, status, statusText, url
+                        })
+                    )
+                );
             }
         }
     }
 
-    private processRsp(rsp: HttpResponse<Response>) {
-        console.log('- 处理返回 -', rsp);
-        const body = rsp.body;
-        const code = body && body.code;
-        // 对共同code做处理
-        // case里如果没必要做下一步处理的，直接return就行
-        switch (code) {
-            case 1001: // 未知错误
-                console.log('...未知错误');
-                break;
-            case 1005: // token已过期
-                // 提示错误，可能还要跳到登录页
-                break;
-            // ... other cases
-            default:
-                // default handler...
-                break;
-        }
-        return body;
+private processRsp(rsp: HttpResponse<Response>): HttpResult {
+    console.log('- 处理返回 -');
+    const { body, ...opts } = rsp;
+    const code = body && body.code;
+    // 对共同code做处理
+    // case里如果没必要做下一步处理的，直接return就行
+    switch (code) {
+        case 1001: // 未知错误
+            console.log('...未知错误');
+            break;
+        case 1005: // token已过期
+            // 提示错误，可能还要跳到登录页
+            break;
+        // ... other cases
+        default:
+            // default handler...
+            break;
     }
+    return { body, opts };
+}
 
     private obj2urlParam(data: Object): string {
         return Object.keys(data).map((key) => {

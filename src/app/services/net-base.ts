@@ -14,6 +14,12 @@ import 'rxjs/add/observable/of';
 
 const API_BASE_URL = 'https://api.ngbook.net/';
 
+export interface Response {
+    code: number;
+    data?: any;
+    msg?: string; // additional message
+}
+
 @Injectable()
 export class RequestBase {
 
@@ -26,11 +32,11 @@ export class RequestBase {
         data?: any): Observable<any> {
         const url = API_BASE_URL + urlWithoutDomain;
         const headers = this.wrapHeader();
-        const options: any = {
+        const options = {
             headers,
         };
 
-        const observe = this.http.post<Object>(
+        const observe = this.http.post<Response>(
             url, data, options);
         return observe.map(this.processRsp.bind(this))
             .catch(error => this.handleError(error));
@@ -63,7 +69,7 @@ export class RequestBase {
         return Observable.of(error);
     }
 
-    private processRsp(rsp: any) {
+    private processRsp(rsp: Response) {
         console.log('- 处理返回 -');
         if (rsp instanceof Event) { // ProgressEvent
             return {

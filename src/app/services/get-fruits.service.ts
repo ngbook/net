@@ -3,10 +3,8 @@ import {
     Headers, RequestOptions
 } from '@angular/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/empty';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { RequestBase } from './net-base';
 
@@ -14,10 +12,12 @@ import { RequestBase } from './net-base';
 export class GetFruitsService extends RequestBase {
 
     request(url, data): Observable<any> {
-        return this.post(url).map((rsp) => {
-            // 对body做相应的处理，比如数据的格式化等
-            // ...
-            return rsp.body;
-        });
+        return this.post(url).pipe(
+            map((rsp) => {
+                // 对body做相应的处理，比如数据的格式化等
+                // ...
+                return rsp.body;
+            })
+        );
     }
 }

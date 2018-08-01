@@ -59,9 +59,7 @@ export class RequestBase {
         reqMethod: string,
         url: string, data?: any
     ): Observable<HttpResult> {
-        const headers = this.wrapHeader();
         const options: any = {
-            headers,
             observe: 'response',
         };
 
@@ -79,17 +77,6 @@ export class RequestBase {
                 HttpResult>(this.processRsp.bind(this)),
             catchError(error => this.handleError(error))
         );
-    }
-
-    /**
-     * 定制请求头等 通用请求部分
-     */
-    private wrapHeader() {
-        const authToken = localStorage.getItem('auth') || '';
-        const headers = {
-            'Authorization': authToken,
-        };
-        return headers;
     }
 
     /**

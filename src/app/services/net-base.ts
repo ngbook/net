@@ -9,10 +9,8 @@ import {
     HttpHeaders,
     HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 const API_BASE_URL = 'https://api.ngbook.net/';
 
@@ -74,8 +72,10 @@ export class RequestBase {
             observe = this.http.get<HttpResponse<Object>>(
                 url, options);
         }
-        return observe.map(this.processRsp.bind(this))
-            .catch(error => this.handleError(error));
+        return observe.pipe(
+            map(this.processRsp.bind(this),
+                catchError(error => this.handleError(error))
+            );
     }
 
     /**
@@ -87,10 +87,10 @@ export class RequestBase {
             // 有时会遇到：虽然返回状态非200，但也有返回结果，则把它抽出来经 processRsp 再处理一次
             const body = error.error;
             if (body) {
-                return Observable.of(this.processRsp(body));
+                return of(this.processRsp(body));
             }
         }
-        return Observable.of(error);
+        return of(error);
     }
 
     private processRsp(rsp: any) {

@@ -17,7 +17,7 @@ export class GetFruitsService extends RequestBase {
         return this.post(url).map((rsp) => {
             // 对body做相应的处理，比如数据的格式化等
             // ...
-            return rsp;
+            return rsp.body;
         });
     }
 }

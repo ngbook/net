@@ -4,15 +4,13 @@ import { GetFruitsService } from './services/get-fruits.service';
 const API_URL = 'http://api.ngbook.net/fruit/';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
     data: any;
-    constructor(private fruitReq: GetFruitsService) {
-
-    }
+    constructor(private fruitReq: GetFruitsService) { }
     ngOnInit() {
         // request list
         this.request(API_URL);

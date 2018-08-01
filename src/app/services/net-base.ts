@@ -10,10 +10,8 @@ import {
     HttpEvent,
     HttpResponseBase,
 } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/observable/of';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 
 const API_BASE_URL = 'https://api.ngbook.net/';
 
@@ -73,10 +71,11 @@ export class RequestBase {
             observe = this.http.get<Response>(
                 url, options);
         }
-        return observe
-            .map<HttpEvent<Response>,
-                 HttpResult>(this.processRsp.bind(this))
-            .catch(error => this.handleError(error));
+        return observe.pipe(
+            map<HttpEvent<Response>,
+                HttpResult>(this.processRsp.bind(this)),
+            catchError(error => this.handleError(error))
+        );
     }
 
     /**
@@ -86,7 +85,7 @@ export class RequestBase {
         if (error.error instanceof ErrorEvent) {
             // 网络错误，或浏览器引起的错误（不包含跨域）
             console.error('发生网络异常...', error.error.message);
-            return Observable.of<HttpResult>({
+            return of<HttpResult>({
                 body: {
                     code: 1001,
                     data: {
@@ -104,7 +103,7 @@ export class RequestBase {
                 const {
                     headers, status, statusText, url
                 } = error;
-                return Observable.of<HttpResult>(
+                return of<HttpResult>(
                     this.processRsp(
                         new HttpResponse<Response>({
                             body,
